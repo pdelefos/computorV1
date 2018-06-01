@@ -55,7 +55,7 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     console.log(result)
     console.log(x)
   } else {
-    let result = `Discriminant is strictly positive, there's no solutions`
+    let result = `Discriminant is strictly negative, there's no solutions`
     console.log(result)
   }
 }
