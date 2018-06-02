@@ -55,8 +55,12 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     console.log(result)
     console.log(x)
   } else {
-    let result = `Discriminant is strictly negative, there's no solutions`
-    console.log(result)
+    let x1 = `x1 = ${-b} + ${Math.sqrt(Math.abs(delta))}i / ${2 * a}`
+    let x2 = `x2 = ${-b} - ${Math.sqrt(Math.abs(delta))}i / ${2 * a}`
+    // let result = `Discriminant is strictly negative, there's no solutions`
+    // console.log(result)
+    console.log(x1)
+    console.log(x2)
   }
 }
 
