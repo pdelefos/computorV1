@@ -10,6 +10,7 @@ function result (expression) {
   let leftTerm = terms[0]
   let rightTerm = terms[1]
   leftTerm = parseTerm(leftTerm)
+  console.log(leftTerm)
   rightTerm = parseTerm(rightTerm)
   rightTerm = evaluateRightTerm(rightTerm)
   let allTerms = [...leftTerm, ...rightTerm]
@@ -112,6 +113,9 @@ function parseTerm (term) {
       subString.join('')
       splited = splited.map(m => {
         let newMonome = subString.join(' ').trim()
+        console.log(newMonome)
+        console.log(m)
+        console.log('sub', newMonome.substring(1, newMonome.length))
         if (newMonome.substring(1, newMonome.length) == m) return newMonome
         return m
       })
@@ -134,7 +138,7 @@ function simplifyTerms (terms) {
 
 function evaluateRightTerm (rightTerm) {
   return rightTerm.map(m => {
-    if (m.value > 0) m.value *= -1
+    m.value *= -1
     return m
   })
 }
