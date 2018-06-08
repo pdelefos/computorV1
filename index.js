@@ -120,6 +120,10 @@ function parseTerm (term) {
         if (c == '-') eqTab[idx + 1] = `-${eqTab[idx + 1]}`
         return acc
       }, new Array())
+      // let powPosition
+      // while ((powPosition = eqTab.indexOf('^')) != -1) {
+
+      // }
       console.log(eqTab)
     }
     acc.push(...splited)
