@@ -1,23 +1,24 @@
 'use strict'
 
 let expression = process.argv[2]
-if (!expression) console.log('rien')
-
-result(expression)
+if (!expression) console.log('no equation')
+else result(expression)
 
 function result (expression) {
   let terms = expression.trim().split('=')
   let leftTerm = terms[0]
   let rightTerm = terms[1]
+
   leftTerm = parseTerm(leftTerm)
-  console.log(leftTerm)
   rightTerm = parseTerm(rightTerm)
   rightTerm = evaluateRightTerm(rightTerm)
   let allTerms = [...leftTerm, ...rightTerm]
+
   let simplifiedTerms = simplifyTerms(allTerms)
   let eqDegreee = findPolynomialDegree(allTerms)
   console.log('Reduced form: ' + getEquationString(simplifiedTerms))
   console.log('Polynomial degree: ' + eqDegreee)
+
   if (eqDegreee == 0) {
     console.log('The solution include all real numbers.')
     return
@@ -32,9 +33,9 @@ function result (expression) {
 }
 
 function calculateSolution (simplifiedTerms, eqDegreee) {
-  let a = findValudeByXPower(simplifiedTerms, 2)
-  let b = findValudeByXPower(simplifiedTerms, 1)
-  let c = findValudeByXPower(simplifiedTerms, 0)
+  let a = findValueByXPower(simplifiedTerms, 2)
+  let b = findValueByXPower(simplifiedTerms, 1)
+  let c = findValueByXPower(simplifiedTerms, 0)
   if (eqDegreee == 1) {
     let result = 'The solution is:'
     let x = -c / b
@@ -69,7 +70,7 @@ function calculateDelta (a, b, c) {
   return Math.pow(b, 2) - 4 * a * c
 }
 
-function findValudeByXPower (terms, xPower) {
+function findValueByXPower (terms, xPower) {
   let monome = terms.find(m => m.xPower == xPower)
   let value = 0
   if (monome) value = monome.value
@@ -104,21 +105,22 @@ function parseTerm (term) {
     let splited = x.split('-').map(x => x.trim())
     splited = trimArray(splited)
     if (x != splited) {
-      let minusIndex = x.indexOf('-')
-      let subString = x.substring(minusIndex, x.length).split(' ')
-      if (subString[0] == '-') {
-        subString[1] = '-' + subString[1]
-        subString.splice(0, 1)
-      }
-      subString.join('')
-      splited = splited.map(m => {
-        let newMonome = subString.join(' ').trim()
-        console.log(newMonome)
-        console.log(m)
-        console.log('sub', newMonome.substring(1, newMonome.length))
-        if (newMonome.substring(1, newMonome.length) == m) return newMonome
-        return m
-      })
+      let eqTab = trimArray(x.split(''), ' ')
+      eqTab = eqTab.reduce((acc, c, idx) => {
+        if (c != '-') {
+          acc.push(c)
+          return acc
+        }
+        let nextChar = eqTab[idx + 1]
+        if (nextChar == '-') {
+          console.log('c', c, 'next', nextChar)
+          eqTab.splice(idx, 1)
+          return acc
+        }
+        if (c == '-') eqTab[idx + 1] = `-${eqTab[idx + 1]}`
+        return acc
+      }, new Array())
+      console.log(eqTab)
     }
     acc.push(...splited)
     return acc
@@ -156,12 +158,12 @@ function parseMonome (monome) {
   let x = monome.split('*').map(x => x.trim())
   const data = {
     value: parseFloat(x[0]),
-    xPower: getXPower(x[1])
+    xPower: parseXPower(x[1])
   }
   return data
 }
 
-function getXPower (exp) {
+function parseXPower (exp) {
   return parseInt(exp.split('^')[1].trim())
 }
 
@@ -170,6 +172,6 @@ function sortTermByPower (term) {
   return term.sort(byPowerDesc)
 }
 
-function trimArray (array) {
-  return array.filter(x => x != '')
+function trimArray (array, c = '') {
+  return array.filter(x => x != c)
 }
