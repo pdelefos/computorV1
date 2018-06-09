@@ -15,7 +15,7 @@ function result (expression) {
   let allTerms = [...leftTerm, ...rightTerm]
 
   let simplifiedTerms = simplifyTerms(allTerms)
-  let eqDegreee = findPolynomialDegree(allTerms)
+  let eqDegreee = findPolynomialDegree(simplifiedTerms)
   console.log('Reduced form: ' + getEquationString(simplifiedTerms))
   console.log('Polynomial degree: ' + eqDegreee)
 
@@ -57,8 +57,8 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     console.log(result)
     console.log(x)
   } else {
-    let x1 = `x1 = ${-b} + ${Math.sqrt(Math.abs(delta))}i / ${2 * a}`
-    let x2 = `x2 = ${-b} - ${Math.sqrt(Math.abs(delta))}i / ${2 * a}`
+    let x1 = `x1 = ${-b} + ${Math.sqrt(Math.abs(delta)).toFixed(5)}i / ${2 * a}`
+    let x2 = `x2 = ${-b} - ${Math.sqrt(Math.abs(delta)).toFixed(5)}i / ${2 * a}`
     // let result = `Discriminant is strictly negative, there's no solutions`
     // console.log(result)
     console.log(x1)
@@ -111,14 +111,18 @@ function parseTerm (term) {
     acc.push(...minusSplited)
     return acc
   }, [])
-  console.log('terms', monomes)
   return createTermObject(monomes)
 }
 
 function trimMinus (terms) {
   return terms.map(m => {
     let x = m.split('')
-    x = x.filter((a, b) => !(a == '-' && a == b)).join('')
+    x = x
+      .map((a, idx) => {
+        if (x[idx] == '-' && x[idx + 1] == '-') x.splice(idx, 1)
+        return a
+      })
+      .join('')
     return x
   })
 }
@@ -142,6 +146,7 @@ function simplifyTerms (terms) {
     if (!mSamePower) simplifiedEq.push(m)
     else mSamePower.value += m.value
   })
+  simplifiedEq = simplifiedEq.filter(m => m.value != 0)
   return simplifiedEq
 }
 
