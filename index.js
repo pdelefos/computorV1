@@ -102,34 +102,37 @@ function getEquationString (equation) {
 function parseTerm (term) {
   let monomes = term.split('+').reduce((acc, x) => {
     x = x.trim()
-    let splited = x.split('-').map(x => x.trim())
-    splited = trimArray(splited)
-    if (x != splited) {
-      let eqTab = trimArray(x.split(''), ' ')
-      eqTab = eqTab.reduce((acc, c, idx) => {
-        if (c != '-') {
-          acc.push(c)
-          return acc
-        }
-        let nextChar = eqTab[idx + 1]
-        if (nextChar == '-') {
-          console.log('c', c, 'next', nextChar)
-          eqTab.splice(idx, 1)
-          return acc
-        }
-        if (c == '-') eqTab[idx + 1] = `-${eqTab[idx + 1]}`
-        return acc
-      }, new Array())
-      // let powPosition
-      // while ((powPosition = eqTab.indexOf('^')) != -1) {
-
-      // }
-      console.log(eqTab)
+    let minusSplited = splitMinus(x)
+    if (x != minusSplited) minusSplited = trimMinus(minusSplited)
+    else {
+      acc.push(minusSplited)
+      return acc
     }
-    acc.push(...splited)
+    acc.push(...minusSplited)
     return acc
-  }, new Array())
+  }, [])
+  console.log('terms', monomes)
   return createTermObject(monomes)
+}
+
+function trimMinus (terms) {
+  return terms.map(m => {
+    let x = m.split('')
+    x = x.filter((a, b) => !(a == '-' && a == b)).join('')
+    return x
+  })
+}
+
+function splitMinus (terms) {
+  if (terms.indexOf('-') == -1) return terms
+  terms = terms.split(' ')
+  let idx = 0
+  return terms.reduce((acc, c, id) => {
+    if (c == '-' && id != 0) idx++
+    if (typeof acc[idx] === 'undefined') acc[idx] = c
+    else acc[idx] += c
+    return acc
+  }, [])
 }
 
 function simplifyTerms (terms) {
@@ -153,7 +156,7 @@ function createTermObject (monomes) {
   let termData = monomes.reduce((acc, m) => {
     acc.push(parseMonome(m))
     return acc
-  }, new Array())
+  }, [])
   termData = sortTermByPower(termData)
   return termData
 }
