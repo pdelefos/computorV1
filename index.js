@@ -15,12 +15,15 @@ function result (expression) {
   let allTerms = [...leftTerm, ...rightTerm]
 
   let simplifiedTerms = simplifyTerms(allTerms)
+  simplifiedTerms = sortTermByPower(simplifiedTerms)
   let eqDegreee = findPolynomialDegree(simplifiedTerms)
   console.log('Reduced form: ' + getEquationString(simplifiedTerms))
   console.log('Polynomial degree: ' + eqDegreee)
 
   if (eqDegreee == 0) {
-    console.log('The solution include all real numbers.')
+    if (findValueByXPower(simplifiedTerms, 0) != 0) {
+      console.log("there's no solution")
+    } else console.log('The solution include all real numbers.')
     return
   }
   if (eqDegreee > 2) {
@@ -57,10 +60,21 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     console.log(result)
     console.log(x)
   } else {
-    let x1 = `x1 = ${-b} + ${Math.sqrt(Math.abs(delta)).toFixed(5)}i / ${2 * a}`
-    let x2 = `x2 = ${-b} - ${Math.sqrt(Math.abs(delta)).toFixed(5)}i / ${2 * a}`
-    // let result = `Discriminant is strictly negative, there's no solutions`
-    // console.log(result)
+    let xa1 = null
+    let xb1 = null
+    if (b % (2 * a) == 0) {
+      xa1 = -b / (2 * a)
+    } else {
+      xa1 = `${-b} / ${2 * a}`
+    }
+    delta = Math.sqrt(Math.abs(delta))
+    if (delta % (2 * a) == 0) {
+      xb1 = `${delta / (2 * a)}i`
+    } else {
+      xb1 = `${delta}i / ${2 * a}`
+    }
+    let x1 = `${xa1} + ${xb1}`
+    let x2 = `${xa1} - ${xb1}`
     console.log(x1)
     console.log(x2)
   }
@@ -79,7 +93,7 @@ function findValueByXPower (terms, xPower) {
 
 function findPolynomialDegree (terms) {
   return terms.reduce((acc, m) => {
-    if (m.xPower > acc) acc = m.xPower
+    if (m.value != 0 && m.xPower > acc) acc = m.xPower
     return acc
   }, 0)
 }
@@ -146,7 +160,7 @@ function simplifyTerms (terms) {
     if (!mSamePower) simplifiedEq.push(m)
     else mSamePower.value += m.value
   })
-  simplifiedEq = simplifiedEq.filter(m => m.value != 0)
+  // simplifiedEq = simplifiedEq.filter(m => m.value != 0)
   return simplifiedEq
 }
 
@@ -167,6 +181,7 @@ function createTermObject (monomes) {
 }
 
 function parseMonome (monome) {
+  console.log('sd', monome)
   let x = monome.split('*').map(x => x.trim())
   const data = {
     value: parseFloat(x[0]),
