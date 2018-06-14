@@ -16,6 +16,9 @@ function result (expression) {
 
   let simplifiedTerms = simplifyTerms(allTerms)
   simplifiedTerms = sortTermByPower(simplifiedTerms)
+  if (!PowerFormatOk(simplifiedTerms)) {
+    return console.log('Power must be a positive integer or 0')
+  }
   let eqDegreee = findPolynomialDegree(simplifiedTerms)
   console.log('Reduced form: ' + getEquationString(simplifiedTerms))
   console.log('Polynomial degree: ' + eqDegreee)
@@ -56,7 +59,7 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     console.log(x2)
   } else if (delta == 0) {
     let x = -b / (2 * a)
-    let result = 'The solution is:'
+    let result = 'Discriminant is null, the solution is:'
     console.log(result)
     console.log(x)
   } else {
@@ -65,19 +68,28 @@ function calculateSolution (simplifiedTerms, eqDegreee) {
     if (b % (2 * a) == 0) {
       xa1 = -b / (2 * a)
     } else {
-      xa1 = `${-b} / ${2 * a}`
+      xa1 = `${-b / (2 * a)}`
     }
     delta = Math.sqrt(Math.abs(delta))
     if (delta % (2 * a) == 0) {
       xb1 = `${delta / (2 * a)}i`
     } else {
-      xb1 = `${delta}i / ${2 * a}`
+      xb1 = `${delta / (2 * a)}i`
     }
     let x1 = `${xa1} + ${xb1}`
     let x2 = `${xa1} - ${xb1}`
+    let result = 'Discriminant is strictly negative, the two solutions are:'
+    console.log(result)
     console.log(x1)
     console.log(x2)
   }
+}
+
+function PowerFormatOk (terms) {
+  return (
+    !terms.some(m => m.xPower < 0) &&
+    !terms.some(m => Number(m.xPower) === m.xPower && m.xPower % 1 !== 0)
+  )
 }
 
 function calculateDelta (a, b, c) {
@@ -160,7 +172,9 @@ function simplifyTerms (terms) {
     if (!mSamePower) simplifiedEq.push(m)
     else mSamePower.value += m.value
   })
-  // simplifiedEq = simplifiedEq.filter(m => m.value != 0)
+  simplifiedEq = simplifiedEq.filter(
+    m => m.value != 0 || (m.value == 0 && m.xPower == 0)
+  )
   return simplifiedEq
 }
 
@@ -181,7 +195,6 @@ function createTermObject (monomes) {
 }
 
 function parseMonome (monome) {
-  console.log('sd', monome)
   let x = monome.split('*').map(x => x.trim())
   const data = {
     value: parseFloat(x[0]),
@@ -191,7 +204,8 @@ function parseMonome (monome) {
 }
 
 function parseXPower (exp) {
-  return parseInt(exp.split('^')[1].trim())
+  let power = exp.split('^')[1].trim()
+  return parseFloat(power)
 }
 
 function sortTermByPower (term) {
